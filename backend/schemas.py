@@ -1,35 +1,24 @@
 from pydantic import BaseModel
-from datetime import datetime
 from typing import List, Optional
 
-# ----------------------------------
-# Kunden
-# ----------------------------------
+# ===== Kunden =====
 class CustomerBase(BaseModel):
     name: str
-    street: Optional[str] = None
-    city: Optional[str] = None
+    email: str
     phone: Optional[str] = None
-    email: Optional[str] = None
 
 class CustomerCreate(CustomerBase):
     pass
 
 class Customer(CustomerBase):
     id: int
-
     class Config:
         orm_mode = True
 
-
-# ----------------------------------
-# Fahrzeuge
-# ----------------------------------
+# ===== Fahrzeuge =====
 class VehicleBase(BaseModel):
-    manufacturer: str
-    model: str
     license_plate: str
-    vin: Optional[str] = None
+    model: str
 
 class VehicleCreate(VehicleBase):
     customer_id: int
@@ -37,36 +26,27 @@ class VehicleCreate(VehicleBase):
 class Vehicle(VehicleBase):
     id: int
     customer_id: int
-
     class Config:
         orm_mode = True
 
-
-# ----------------------------------
-# Artikel
-# ----------------------------------
+# ===== Artikel =====
 class ArticleBase(BaseModel):
     name: str
     price_net: float
-    vat_rate: Optional[float] = 19.0
-    stock: Optional[int] = 0
+    vat_rate: float = 19.0
 
 class ArticleCreate(ArticleBase):
     pass
 
 class Article(ArticleBase):
     id: int
-
     class Config:
         orm_mode = True
 
-
-# ----------------------------------
-# Aufträge
-# ----------------------------------
+# ===== Order Items =====
 class OrderItemBase(BaseModel):
     article_id: int
-    quantity: int = 1
+    quantity: int
 
 class OrderItemCreate(OrderItemBase):
     pass
@@ -74,42 +54,22 @@ class OrderItemCreate(OrderItemBase):
 class OrderItem(OrderItemBase):
     id: int
     article: Article
-
     class Config:
         orm_mode = True
 
-
+# ===== Aufträge =====
 class OrderBase(BaseModel):
     customer_id: int
     vehicle_id: int
     description: Optional[str] = None
 
 class OrderCreate(OrderBase):
-    items: List[OrderItemCreate] = []
+    items: List[OrderItemCreate]
 
 class Order(OrderBase):
     id: int
-    items: List[OrderItem] = []
-
-    class Config:
-        orm_mode = True
-
-
-# ----------------------------------
-# Rechnungen
-# ----------------------------------
-class InvoiceBase(BaseModel):
-    order_id: int
-
-class InvoiceCreate(InvoiceBase):
-    pass
-
-class Invoice(InvoiceBase):
-    id: int
-    date_issued: datetime
-    total_net: float
-    total_vat: float
-    total_gross: float
-
+    items: List[OrderItem]
+    customer: Customer
+    vehicle: Vehicle
     class Config:
         orm_mode = True
