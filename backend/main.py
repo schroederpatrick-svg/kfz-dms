@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 import models, schemas
 
-# DB-Tabellen erstellen
+# ===== Datenbank-Setup =====
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="KFZ Werkstatt DMS API")
@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# Dependency
+# ===== Dependency =====
 def get_db():
     db = SessionLocal()
     try:
@@ -102,9 +102,8 @@ def read_invoices(db: Session = next(get_db())):
         })
     return invoices
 
-# PDF-Download Endpoint
+# PDF-Download Endpoint (Dummy, später mit ReportLab o.ä. generieren)
 @app.get("/api/invoices/{invoice_id}/pdf")
 def download_invoice(invoice_id: int):
-    # Dummy PDF (hier später mit ReportLab oder ähnlichem generieren)
     from fastapi.responses import FileResponse
     return FileResponse("backend/sample_invoice.pdf", media_type="application/pdf", filename=f"invoice_{invoice_id}.pdf")
